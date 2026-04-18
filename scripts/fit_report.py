@@ -37,7 +37,7 @@ def load_json(path: Path) -> dict:
 
 
 def candidate_dir(candidate_id: str) -> Path:
-    d = Path("candidates") / candidate_id
+    d = Path("data/candidates") / candidate_id
     if not d.exists():
         sys.exit(f"Candidate not found: {candidate_id}")
     return d

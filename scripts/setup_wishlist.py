@@ -23,7 +23,7 @@ from datetime import date
 # ---------------------------------------------------------------------------
 
 def candidate_dir(candidate_id: str) -> Path:
-    d = Path("candidates") / candidate_id
+    d = Path("data/candidates") / candidate_id
     if not d.exists():
         sys.exit(f"Candidate not found: {candidate_id}\nRun ingest_cvs.py first.")
     return d

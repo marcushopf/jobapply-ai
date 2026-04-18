@@ -34,7 +34,7 @@ def candidate_id_from_name(name: str) -> str:
 
 
 def candidate_dir(candidate_id: str) -> Path:
-    return Path("candidates") / candidate_id
+    return Path("data/candidates") / candidate_id
 
 
 def ensure_structure(candidate_id: str) -> Path:
@@ -163,7 +163,7 @@ def init_tracker(candidate_id: str, candidate_name: str) -> dict:
 
 
 def update_candidates_index(candidate_id: str, candidate_name: str):
-    index_path = Path("candidates/index.json")
+    index_path = Path("data/candidates/index.json")
     index = json.loads(index_path.read_text()) if index_path.exists() else {"candidates": {}}
     index["candidates"][candidate_id] = {
         "name": candidate_name,
