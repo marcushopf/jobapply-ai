@@ -119,6 +119,7 @@ jobapply-ai/
 - [x] Stage 4b: Fit report — score vs. each target title + dream job deep analysis (`scripts/fit_report.py`)
 - [ ] Stage 5: Application generator — tailored CV + cover letter per job (`scripts/generate_application.py`)
 - [ ] Stage 5b: CV template & ATS-safe formatting (role-aware, Markdown → PDF, no design tool needed)
+- [ ] Stage 6: LinkedIn profile optimiser — headline, summary, keywords, skills, open-to-work settings (`scripts/linkedin_profile.py`) → outputs `candidates/[id]/linkedin_profile.md` ready to copy-paste
 
 ### Phase 2 — Continuous Improvement
 > Items graduate here from IDEAS.md once scoped and prioritised.

@@ -68,7 +68,7 @@ Source: https://www.linkedin.com/learning/a-career-strategist-s-guide-to-getting
 | Identify a target job | High | Done — wishlist + fit report | Already covered |
 | Informational interviews | Medium | Not covered | Track networking conversations per target company |
 | Find the right job postings | High | Done — SerpAPI/Google Jobs | Already covered |
-| Attract / find recruiters | High | Not covered | Generate a tailored LinkedIn summary the candidate can use to attract recruiters |
+| Attract / find recruiters | High | Not covered | Generate tailored LinkedIn profile copy (headline, summary, skills, keywords) → candidate pastes manually. Note: LinkedIn API does not allow automated profile updates. |
 | Enlist a network | Medium | Not covered | Network tracker — who do you know at target companies? |
 | Get "ins" at companies | Medium | Not covered | Target company research module — news, culture, key people |
 | Craft a professional brand | High | Partial — CV + cover letter | Add LinkedIn profile optimisation suggestions as output |
