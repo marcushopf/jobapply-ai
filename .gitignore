@@ -1,4 +1,15 @@
+# Environment
 .env
+
+# CV files — kept local, never pushed (privacy + size)
+candidates/*/cvs/
+
+# Generated data — kept local (personal candidate data)
+candidates/*/interviews/
+candidates/*/job_screenings/
+candidates/*/applications/
+
+# Python
 *.pyc
 __pycache__/
 .DS_Store
