@@ -1,41 +1,42 @@
 # JobApply AI — Claude Code Instructions
 
 ## What This Project Is
-A smart job application agent that interviews the user once, then applies to many jobs on their behalf — fully tailored per job, fully tracked.
+A smart job application agent for multiple candidates. Each candidate uploads their CVs,
+the system finds relevant jobs, identifies gaps between their profile and those jobs,
+runs a targeted interview to fill only the relevant gaps, then generates tailored applications.
 
 ## Start of Every Session
-1. Read `tracker.json` — understand current state (profile completeness, sessions run, jobs screened, applications sent)
-2. Read `candidate/profile.json` — know what we already know about the candidate
-3. Read `PLAN.md` — check which stages are complete
-4. Never repeat work already done (e.g. don't re-ask interview questions already answered)
+1. Ask which candidate you're working with (or list existing ones in `candidates/`)
+2. Read `candidates/[id]/tracker.json` — understand current stage and what's done
+3. Read `candidates/[id]/profile.json` — know what we already know
+4. Check `candidates/[id]/gap_report.json` if it exists — know what gaps remain
+5. Read `PLAN.md` — check overall build status
+6. Never repeat work already done
+
+## The Funnel (in order)
+1. Upload CVs → parse → profile.json
+2. Screen jobs → shortlist
+3. Gap analysis → gap_report.json
+4. Targeted interview → enrich profile.json
+5. Generate tailored applications
 
 ## Key Rules
-- `tracker.json` is the single source of truth — always update it after any action
-- One question at a time during interviews — never overwhelm the user
-- All generated files go in the correct folders (see PLAN.md for structure)
-- Adzuna API key stored in `.env` (never commit this file)
-- Claude API key stored in `.env` (never commit this file)
+- Each candidate is fully isolated under `candidates/[candidate_id]/`
+- `tracker.json` (per candidate) is the source of truth — always update after any action
+- Interview questions must be driven by `gap_report.json` — not generic
+- One question at a time during interviews
+- API keys stored in `.env` (never commit)
 
-## Folder Structure
+## Environment Variables (.env)
 ```
-jobapply-ai/
-├── tracker.json          # Central state — read first every session
-├── PLAN.md               # Build plan and stage status
-├── CLAUDE.md             # This file
-├── candidate/
-│   ├── profile.json      # Structured candidate profile
-│   └── interviews/       # Session transcripts (session_001.md, etc.)
-├── job_screenings/
-│   ├── screening_log.json
-│   └── details/          # Per-job screening details
-├── applications/
-│   └── app_NNN_company/  # cover_letter.md, cv_tailored.md, meta.json
-└── question_bank/
-    └── questions.json    # Interview questions by job category
+ANTHROPIC_API_KEY=
+ADZUNA_APP_ID=
+ADZUNA_APP_KEY=
 ```
 
 ## Current Next Step
-Build the interview bot (Stage 1). It should:
-- Read tracker.json to find known_gaps and profile_completeness
-- Ask targeted questions to fill gaps
-- Save output to candidate/profile.json and candidate/interviews/
+Build Stage 1: CV ingestion script (`scripts/ingest_cvs.py`)
+- Takes a candidate name + CV file paths as input
+- Creates the candidate folder structure
+- Parses CVs using Claude API
+- Writes structured output to `candidates/[id]/profile.json`
