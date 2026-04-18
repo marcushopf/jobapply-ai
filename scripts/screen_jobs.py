@@ -49,6 +49,11 @@ def load_profile(candidate_id: str) -> dict:
     return json.loads(path.read_text())
 
 
+def load_wishlist(candidate_id: str) -> dict:
+    path = Path("candidates") / candidate_id / "wishlist.json"
+    return json.loads(path.read_text()) if path.exists() else {}
+
+
 def load_tracker(candidate_id: str) -> dict:
     path = Path("candidates") / candidate_id / "tracker.json"
     return json.loads(path.read_text()) if path.exists() else {}
@@ -95,35 +100,43 @@ def slugify(text: str) -> str:
 # Search
 # ---------------------------------------------------------------------------
 
-def build_search_queries(profile: dict) -> list[str]:
-    """Build search queries from candidate profile preferences and experience."""
+def build_search_queries(profile: dict, wishlist: dict) -> list[str]:
+    """Build search queries from wishlist (primary) and profile (fallback)."""
     queries = []
-    prefs = profile.get("preferences", {})
-    job_titles = prefs.get("job_titles", [])
-    locations = prefs.get("locations", [])
 
-    # If no preferences set, infer from most recent experience
-    if not job_titles:
-        exp = profile.get("experience", [])
-        if exp:
-            job_titles = [exp[0].get("title", "")]
+    # Wishlist is the primary source
+    all_titles = wishlist.get("dream_jobs", []) + wishlist.get("also_open_to", [])
+    locations = wishlist.get("target_locations", [])
+
+    # Fallback to profile preferences
+    if not all_titles:
+        prefs = profile.get("preferences", {})
+        all_titles = prefs.get("job_titles", [])
+        if not all_titles:
+            exp = profile.get("experience", [])
+            if exp:
+                all_titles = [exp[0].get("title", "")]
 
     if not locations:
-        locations = [profile.get("location", "")]
+        prefs = profile.get("preferences", {})
+        locations = prefs.get("locations", [profile.get("location", "")])
 
-    # Build title x location combinations (max 3 queries)
-    for title in job_titles[:2]:
+    # Build title x location combinations
+    for title in all_titles[:3]:
         for location in locations[:2]:
             if title and location:
                 queries.append(f"{title} {location}")
             elif title:
                 queries.append(title)
 
-    # Fallback
-    if not queries:
-        queries = ["Software Engineer"]
+    # Add target company searches for dream jobs
+    target_companies = wishlist.get("target_companies", [])
+    dream_title = all_titles[0] if all_titles else ""
+    for company in target_companies[:2]:
+        if dream_title:
+            queries.append(f"{dream_title} {company}")
 
-    return queries[:3]
+    return queries[:6] if queries else ["Software Engineer"]
 
 
 def search_google_jobs(query: str, location: str = "") -> list[dict]:
@@ -202,13 +215,16 @@ def get_manual_job() -> dict:
 # Scoring
 # ---------------------------------------------------------------------------
 
-def score_job(job: dict, profile: dict, client: anthropic.Anthropic) -> tuple[int, str]:
+def score_job(job: dict, profile: dict, wishlist: dict, client: anthropic.Anthropic) -> tuple[int, str]:
     """Score a job against a candidate profile using Claude. Returns (score, reasoning)."""
 
-    prompt = f"""You are scoring a job listing against a candidate profile for job matching.
+    prompt = f"""You are scoring a job listing against a candidate profile and their wishlist.
 
 Candidate Profile:
 {json.dumps(profile, indent=2)}
+
+Candidate Wishlist (what they actually want):
+{json.dumps(wishlist, indent=2)}
 
 Job Listing:
 Title: {job['title']}
@@ -217,10 +233,10 @@ Location: {job['location']}
 Description: {job['description'][:2000]}
 
 Score this job from 0 to 100 based on:
-- Skills match (40 points): How well do the candidate's skills match the job requirements?
-- Experience match (30 points): Does their experience level and background fit?
-- Preferences match (20 points): Does the location/remote/industry match their preferences?
-- Growth potential (10 points): Is this a good career move for the candidate?
+- Skills match (35 points): How well do the candidate's skills match the job requirements?
+- Experience match (25 points): Does their experience level and background fit?
+- Wishlist match (30 points): Does this job align with their dream roles, industries, location, remote preference, salary, must-haves? Penalise hard for deal-breakers.
+- Growth potential (10 points): Is this a good career move toward their dream job?
 
 Return ONLY valid JSON, no explanation:
 {{
@@ -258,9 +274,15 @@ def main():
 
     candidate_id = args.candidate
     profile = load_profile(candidate_id)
+    wishlist = load_wishlist(candidate_id)
     tracker = load_tracker(candidate_id)
     log = load_screening_log(candidate_id)
     client = anthropic.Anthropic()
+
+    if not wishlist:
+        print("No wishlist found. It's recommended to set one up first:")
+        print(f"  python scripts/setup_wishlist.py --candidate {candidate_id}")
+        print("Continuing with profile preferences only...\n")
 
     # Collect jobs to screen
     jobs_to_screen = []
@@ -268,7 +290,7 @@ def main():
     if args.manual:
         jobs_to_screen.append(get_manual_job())
     else:
-        queries = [args.query] if args.query else build_search_queries(profile)
+        queries = [args.query] if args.query else build_search_queries(profile, wishlist)
         print(f"Search queries: {queries}")
 
         seen_titles = {s["title"] + s["company"] for s in log["screenings"]}
@@ -295,7 +317,7 @@ def main():
         job_id = next_job_id(log)
         print(f"  [{job_id}] {job['title']} @ {job['company']} — scoring...", end=" ", flush=True)
 
-        score, reasoning = score_job(job, profile, client)
+        score, reasoning = score_job(job, profile, wishlist, client)
         status = "shortlisted" if score >= args.threshold else "skipped"
         print(f"score: {score} → {status}")
 
