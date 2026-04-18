@@ -3,8 +3,8 @@
 ## The Funnel
 
 ```
-Upload CVs → Parse Profile → Screen & Shortlist Jobs →
-Gap Analysis → Targeted Interview → Generate Applications → Track
+Upload CVs → Parse Profile → Fill Wishlist → Screen & Shortlist Jobs →
+Gap Analysis → Targeted Interview → Fit Report → Generate Applications → Track
 ```
 
 ## Stages
@@ -14,6 +14,14 @@ Gap Analysis → Targeted Interview → Generate Applications → Track
 - Claude parses all CVs and merges into a structured `candidates/[id]/profile.json`
 - Flags what's present and what's missing
 - Supports multiple candidates — each has their own isolated folder
+
+### Stage 1b: Wishlist Setup
+- Interactive CLI captures what the candidate actually wants
+- Dream job titles, also-open-to titles, target industries, locations
+- Remote preference, company size, target companies, salary range
+- Must-haves and deal-breakers
+- Saved to `candidates/[id]/wishlist.json`
+- Feeds directly into job search queries and scoring
 
 ### Stage 2: Job Discovery & Screening
 - Reads candidate preferences and skills from `profile.json`
@@ -35,6 +43,13 @@ Gap Analysis → Targeted Interview → Generate Applications → Track
 - Saves answers back into `profile.json` to enrich it
 - Saves session transcript to `candidates/[id]/interviews/session_NNN.md`
 - Updates `tracker.json` when profile is sufficiently complete
+
+### Stage 4b: Fit Report
+- Scores the candidate against each target job title (not just specific listings)
+- Reply probability per role: high / medium / low / very low
+- Visual score bar for each title
+- Deep dream job analysis: current gaps, how to close them, timeline, stepping stones
+- Saved to `candidates/[id]/fit_report.json`
 
 ### Stage 5: Application Generator
 - For each shortlisted job: generates tailored CV + cover letter using Claude API
@@ -83,8 +98,10 @@ jobapply-ai/
 - [x] Scope defined
 - [x] Folder structure initialized
 - [x] Repo pushed to GitHub
-- [ ] Stage 1: CV ingestion & profile extraction
-- [ ] Stage 2: Job discovery & screening
-- [ ] Stage 3: Gap analysis
-- [ ] Stage 4: Targeted interview bot
-- [ ] Stage 5: Application generator
+- [x] Stage 1: CV ingestion & profile extraction (`scripts/ingest_cvs.py`)
+- [x] Stage 1b: Wishlist setup (`scripts/setup_wishlist.py`)
+- [x] Stage 2: Job discovery & screening via SerpAPI/Google Jobs (`scripts/screen_jobs.py`)
+- [ ] Stage 3: Gap analysis (`scripts/gap_analysis.py`)
+- [ ] Stage 4: Targeted interview bot (`scripts/interview.py`)
+- [x] Stage 4b: Fit report (`scripts/fit_report.py`)
+- [ ] Stage 5: Application generator (`scripts/generate_application.py`)
