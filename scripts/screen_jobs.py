@@ -43,36 +43,36 @@ MAX_RESULTS_PER_QUERY = 10
 # ---------------------------------------------------------------------------
 
 def load_profile(candidate_id: str) -> dict:
-    path = Path("candidates") / candidate_id / "profile.json"
+    path = Path("data/candidates") / candidate_id / "profile.json"
     if not path.exists():
         sys.exit(f"Profile not found: {path}\nRun ingest_cvs.py first.")
     return json.loads(path.read_text())
 
 
 def load_wishlist(candidate_id: str) -> dict:
-    path = Path("candidates") / candidate_id / "wishlist.json"
+    path = Path("data/candidates") / candidate_id / "wishlist.json"
     return json.loads(path.read_text()) if path.exists() else {}
 
 
 def load_tracker(candidate_id: str) -> dict:
-    path = Path("candidates") / candidate_id / "tracker.json"
+    path = Path("data/candidates") / candidate_id / "tracker.json"
     return json.loads(path.read_text()) if path.exists() else {}
 
 
 def save_tracker(candidate_id: str, tracker: dict):
-    path = Path("candidates") / candidate_id / "tracker.json"
+    path = Path("data/candidates") / candidate_id / "tracker.json"
     tracker["last_updated"] = date.today().isoformat()
     path.write_text(json.dumps(tracker, indent=2))
 
 
 def screening_dir(candidate_id: str) -> Path:
-    d = Path("candidates") / candidate_id / "job_screenings" / "details"
+    d = Path("data/candidates") / candidate_id / "job_screenings" / "details"
     d.mkdir(parents=True, exist_ok=True)
     return d
 
 
 def log_path(candidate_id: str) -> Path:
-    return Path("candidates") / candidate_id / "job_screenings" / "screening_log.json"
+    return Path("data/candidates") / candidate_id / "job_screenings" / "screening_log.json"
 
 
 def load_screening_log(candidate_id: str) -> dict:
