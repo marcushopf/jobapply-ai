@@ -105,7 +105,9 @@ jobapply-ai/
 
 > This is the single source of truth for project progress.
 > Check this file at the start of every session to know what's done and what's next.
+> New ideas and inspiration live in IDEAS.md — review it each session and promote worthy items below.
 
+### Phase 1 — Initial Build
 - [x] Scope defined
 - [x] Folder structure initialized (multi-candidate)
 - [x] Repo pushed to GitHub
@@ -117,3 +119,16 @@ jobapply-ai/
 - [x] Stage 4b: Fit report — score vs. each target title + dream job deep analysis (`scripts/fit_report.py`)
 - [ ] Stage 5: Application generator — tailored CV + cover letter per job (`scripts/generate_application.py`)
 - [ ] Stage 5b: CV template & ATS-safe formatting (role-aware, Markdown → PDF, no design tool needed)
+
+### Phase 2 — Continuous Improvement
+> Items graduate here from IDEAS.md once scoped and prioritised.
+> Each improvement gets a checkbox when done.
+
+- [ ] _(next improvement — promote from IDEAS.md)_
+
+---
+
+> **How to add an improvement:**
+> 1. Drop the idea into `IDEAS.md` first (free-form, no pressure)
+> 2. When ready to build, move it here as a `- [ ]` item with a short description
+> 3. Tick it off `- [x]` when done
