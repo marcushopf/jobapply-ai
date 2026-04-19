@@ -35,8 +35,10 @@ ADZUNA_APP_KEY=
 ```
 
 ## Current Next Step
-Build Stage 1: CV ingestion script (`scripts/ingest_cvs.py`)
-- Takes a candidate name + CV file paths as input
-- Creates the candidate folder structure
-- Parses CVs using Claude API
-- Writes structured output to `candidates/[id]/profile.json`
+Build Stage 4: Targeted interview bot (`scripts/interview.py`)
+- Reads `gap_report.json` — only asks questions for unresolved gaps
+- One question at a time, conversational CLI
+- Saves answers back into `profile.json`
+- Flips `gap.resolved = true` after each answer
+- Saves session transcript to `candidates/[id]/interviews/session_NNN.md`
+- Updates `tracker.json` when done

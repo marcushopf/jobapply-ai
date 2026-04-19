@@ -114,7 +114,7 @@ jobapply-ai/
 - [x] Stage 1: CV ingestion & profile extraction (`scripts/ingest_cvs.py`)
 - [x] Stage 1b: Wishlist setup — dream jobs, industries, salary, must-haves (`scripts/setup_wishlist.py`)
 - [x] Stage 2: Job discovery & screening via SerpAPI/Google Jobs (`scripts/screen_jobs.py`)
-- [ ] Stage 3: Gap analysis — compare profile vs. shortlisted job descriptions (`scripts/gap_analysis.py`)
+- [x] Stage 3: Gap analysis — compare profile vs. shortlisted job descriptions (`scripts/gap_analysis.py`)
 - [ ] Stage 4: Targeted interview bot — only asks what's missing for real jobs (`scripts/interview.py`)
 - [x] Stage 4b: Fit report — score vs. each target title + dream job deep analysis (`scripts/fit_report.py`)
 - [ ] Stage 5: Application generator — tailored CV + cover letter per job (`scripts/generate_application.py`)
