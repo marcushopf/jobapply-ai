@@ -24,6 +24,9 @@ from datetime import date
 from pathlib import Path
 
 import anthropic
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -202,8 +205,11 @@ def main():
     cv_texts = []
     for cv_path in cv_paths:
         dest = base / "cvs" / cv_path.name
-        shutil.copy2(cv_path, dest)
-        print(f"Copied: {cv_path.name}")
+        try:
+            shutil.copy2(cv_path, dest)
+            print(f"Copied: {cv_path.name}")
+        except shutil.SameFileError:
+            print(f"Already in place: {cv_path.name}")
         text = extract_text(cv_path)
         cv_texts.append((cv_path.name, text))
 
