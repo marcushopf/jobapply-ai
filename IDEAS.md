@@ -105,3 +105,9 @@ Source: https://www.linkedin.com/learning/a-career-strategist-s-guide-to-getting
 
 <!-- Good ideas but not the right time — revisit later -->
 
+- [ ] **Cloud backup for candidate data** — `data/` is gitignored (private), so it only lives locally. If the machine is lost, all candidate profiles, CVs, job screenings and applications are gone. Need a cloud backup solution decoupled from GitHub. Leading options to evaluate:
+  - **Google Drive** — already installed on this machine (`/Users/marcus/Google Drive`). Could simply move or symlink `data/` into Google Drive. Zero extra cost, automatic sync.
+  - **iCloud Drive** — same idea, built into macOS.
+  - **Encrypted S3 bucket** — more control, good if multi-device or multi-candidate use grows.
+  - **Recommended starting point:** Move `data/` into Google Drive and symlink it back → lowest friction, already authenticated.
+
