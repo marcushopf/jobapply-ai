@@ -12,7 +12,7 @@ Gap Analysis → Targeted Interview → Fit Report → Generate Applications →
 ### Stage 1: CV Ingestion & Profile Extraction
 - Candidate uploads one or more CV files (PDF, DOCX, TXT) to `candidates/[id]/cvs/`
 - Claude parses all CVs and merges into a structured `candidates/[id]/profile.json`
-- Flags what's present and what's missing
+- Flags whats present and whats missing
 - Supports multiple candidates — each has their own isolated folder
 
 ### Stage 1b: Wishlist Setup
@@ -32,7 +32,7 @@ Gap Analysis → Targeted Interview → Fit Report → Generate Applications →
 - Full funnel: e.g. 40 screened → 10 shortlisted
 
 ### Stage 3: Gap Analysis
-- Compares shortlisted job descriptions against the candidate's parsed profile
+- Compares shortlisted job descriptions against the candidates parsed profile
 - Identifies what information is missing or underspecified that jobs require
 - Produces a `gap_report.json` per candidate: which questions need to be asked
 - This drives the interview — no generic questions, only relevant ones
@@ -64,7 +64,7 @@ Gap Analysis → Targeted Interview → Fit Report → Generate Applications →
 - Research best CV examples for specific roles (PM, engineer, etc.)
 - Build an ATS-safe CV template (clean Markdown → PDF)
 - Template should be role-aware: PM CVs emphasise outcomes, engineering CVs emphasise stack/impact
-- Auto-format the tailored CV output so it's always professional without manual design work
+- Auto-format the tailored CV output so its always professional without manual design work
 - Candidate should never need to touch a design tool
 
 ## Folder Structure
@@ -104,7 +104,7 @@ jobapply-ai/
 ## Build Status
 
 > This is the single source of truth for project progress.
-> Check this file at the start of every session to know what's done and what's next.
+> Check this file at the start of every session to know whats done and whats next.
 > New ideas and inspiration live in IDEAS.md — review it each session and promote worthy items below.
 
 ### Phase 1 — Initial Build
@@ -115,7 +115,7 @@ jobapply-ai/
 - [x] Stage 1b: Wishlist setup — dream jobs, industries, salary, must-haves (`scripts/setup_wishlist.py`)
 - [x] Stage 2: Job discovery & screening via SerpAPI/Google Jobs (`scripts/screen_jobs.py`)
 - [x] Stage 3: Gap analysis — compare profile vs. shortlisted job descriptions (`scripts/gap_analysis.py`)
-- [ ] Stage 4: Targeted interview bot — only asks what's missing for real jobs (`scripts/interview.py`)
+- [ ] Stage 4: Targeted interview bot — only asks whats missing for real jobs (`scripts/interview.py`)
 - [x] Stage 4b: Fit report — score vs. each target title + dream job deep analysis (`scripts/fit_report.py`)
 - [ ] Stage 5: Application generator — tailored CV + cover letter per job (`scripts/generate_application.py`)
 - [ ] Stage 5b: CV template & ATS-safe formatting (role-aware, Markdown → PDF, no design tool needed)
@@ -125,6 +125,7 @@ jobapply-ai/
 > Items graduate here from IDEAS.md once scoped and prioritised.
 > Each improvement gets a checkbox when done.
 
+- [ ] Multi-provider LLM support — create `scripts/llm_client.py` factory to toggle between Anthropic and Google Gemini (free tier) via environment variables.
 - [ ] _(next improvement — promote from IDEAS.md)_
 
 ---
