@@ -10,6 +10,7 @@
 
 <!-- Add new ideas below. Format: idea, why it matters, rough effort (small/medium/large) -->
 
+- [ ] **Multi-provider LLM support** — create `scripts/llm_client.py` factory to toggle between Anthropic and Google Gemini (free tier) via environment variables. (Medium)
 - [ ] Integrate LinkedIn Learning / course content to strengthen interview answers and CV language
 - [ ] Auto-detect tone of a job description (formal/startup/corporate) and match cover letter tone
 - [ ] Add a "rejection analyser" — if a candidate gets rejected, learn from the pattern
@@ -23,7 +24,7 @@
 
 <!-- Courses, articles, books, tools worth exploring -->
 
-### LinkedIn Learning — A Career Strategist's Guide to Getting a Job
+### LinkedIn Learning — A Career Strategists Guide to Getting a Job
 Source: https://www.linkedin.com/learning/a-career-strategist-s-guide-to-getting-a-job
 
 **Table of Contents:**
@@ -60,7 +61,7 @@ Source: https://www.linkedin.com/learning/a-career-strategist-s-guide-to-getting
 
 ---
 
-**Analysis — what's relevant for JobApply AI:**
+**Analysis — whats relevant for JobApply AI:**
 
 | Topic | Relevance | Current status | Potential feature |
 |---|---|---|---|
@@ -97,7 +98,7 @@ Source: https://www.linkedin.com/learning/a-career-strategist-s-guide-to-getting
 
 ## Observations & Feedback
 
-<!-- Things noticed during testing, candidate feedback, things that didn't work well -->
+<!-- Things noticed during testing, candidate feedback, things that didnt work well -->
 
 ---
 
@@ -110,4 +111,5 @@ Source: https://www.linkedin.com/learning/a-career-strategist-s-guide-to-getting
   - **iCloud Drive** — same idea, built into macOS.
   - **Encrypted S3 bucket** — more control, good if multi-device or multi-candidate use grows.
   - **Recommended starting point:** Move `data/` into Google Drive and symlink it back → lowest friction, already authenticated.
+
 
