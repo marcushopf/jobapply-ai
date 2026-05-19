@@ -117,6 +117,7 @@ jobapply-ai/
 - [x] Stage 3: Gap analysis — compare profile vs. shortlisted job descriptions (`scripts/gap_analysis.py`)
 - [x] Stage 4: Targeted interview bot — only asks whats missing for real jobs (`scripts/interview.py`)
 - [x] Stage 4b: Fit report — score vs. each target title + dream job deep analysis (`scripts/fit_report.py`)
+- [ ] Stage 4c: Multi-provider LLM support — `scripts/llm_client.py` factory, Gemini free tier default, Anthropic when key present. Update all scripts to use it.
 - [ ] Stage 5: Application generator — tailored CV + cover letter per job (`scripts/generate_application.py`)
 - [ ] Stage 5b: CV template & ATS-safe formatting (role-aware, Markdown → PDF, no design tool needed)
 - [ ] Stage 6: LinkedIn profile optimiser — headline, summary, keywords, skills, open-to-work settings (`scripts/linkedin_profile.py`) → outputs `candidates/[id]/linkedin_profile.md` ready to copy-paste
@@ -125,7 +126,6 @@ jobapply-ai/
 > Items graduate here from IDEAS.md once scoped and prioritised.
 > Each improvement gets a checkbox when done.
 
-- [ ] Multi-provider LLM support — create `scripts/llm_client.py` factory to toggle between Anthropic and Google Gemini (free tier) via environment variables.
 - [ ] _(next improvement — promote from IDEAS.md)_
 
 ---
