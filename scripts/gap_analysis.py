@@ -84,6 +84,11 @@ def save_tracker(candidate_id: str, tracker: dict):
 def extract_gaps_for_job(job: dict, profile: dict, client: anthropic.Anthropic) -> list[dict]:
     """Ask Claude what's missing or underspecified in the profile for this specific job."""
 
+    desc = job.get('description', '')
+    if isinstance(desc, dict):
+        desc = json.dumps(desc)
+    desc = desc[:3000]
+
     prompt = f"""You are a recruiter reviewing a candidate's profile against a job description.
 
 Candidate Profile:
@@ -92,7 +97,7 @@ Candidate Profile:
 Job:
 Title: {job['title']}
 Company: {job['company']}
-Description: {job.get('description', '')[:3000]}
+Description: {desc}
 
 Identify gaps — things the job requires that are missing or too vague in the profile.
 Only flag real gaps: missing skills, unquantified impact, missing context about experience depth,
@@ -195,7 +200,7 @@ def main():
     # Pass 1: extract gaps per job
     raw_gaps_by_job = []
     for job in jobs:
-        job_id = job["id"]
+        job_id = job.get("id") or job.get("job_id")
         print(f"  [{job_id}] {job['title']} @ {job['company']} — extracting gaps...", end=" ", flush=True)
         gaps = extract_gaps_for_job(job, profile, client)
         print(f"{len(gaps)} gap(s) found")
@@ -207,7 +212,7 @@ def main():
         gap_report = {
             "candidate_id": candidate_id,
             "generated_date": date.today().isoformat(),
-            "jobs_analyzed": [j["id"] for j in jobs],
+            "jobs_analyzed": [j.get("id") or j.get("job_id") for j in jobs],
             "gaps": [],
             "counts": {"high": 0, "medium": 0, "low": 0, "total": 0},
             "summary": "No significant gaps identified. Profile covers all shortlisted jobs well.",
@@ -227,7 +232,7 @@ def main():
         gap_report = {
             "candidate_id": candidate_id,
             "generated_date": date.today().isoformat(),
-            "jobs_analyzed": [j["id"] for j in jobs],
+            "jobs_analyzed": [j.get("id") or j.get("job_id") for j in jobs],
             "gaps": gaps,
             "counts": counts,
             "summary": f"{counts['total']} gaps identified: {counts['high']} high, {counts['medium']} medium, {counts['low']} low priority.",
