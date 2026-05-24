@@ -1,0 +1,44 @@
+ALEX MÜLLER
+Senior Product Manager
+Berlin, Germany | alex.mueller@example.com | +49 30 555 01234
+linkedin.com/in/alex-mueller-pm
+
+SUMMARY
+Product manager with 5 years of experience building financial and e-commerce products.
+Experienced in cross-functional collaboration with engineering, design, data, and compliance.
+Based in Berlin, looking to move into a Head of Product or VP of Product role.
+
+EXPERIENCE
+
+Senior Product Manager — Finleap Connect, Berlin (Jan 2022 – Present)
+- Led product strategy for open banking API platform
+- Launched PSD2 compliance features across Germany, Austria, and Spain
+- Worked closely with enterprise clients to define API requirements
+- Collaborated with engineering, legal, and compliance teams on regulatory projects
+- Managed product roadmap and quarterly planning
+
+Product Manager — SumUp, Berlin (Mar 2019 – Dec 2021)
+- Owned the merchant onboarding flow end-to-end
+- Ran A/B tests and user research sessions to improve conversion
+- Wrote product specs, user stories, and acceptance criteria for engineering teams
+- Coordinated with growth, marketing, and support on go-to-market launches
+
+Associate Product Manager — Zalando, Berlin (Jul 2017 – Feb 2019)
+- Supported senior PMs on checkout and payments features
+- Conducted competitor analysis and user interviews
+- Maintained product backlog and prioritisation frameworks
+
+EDUCATION
+M.Sc. Information Systems — Humboldt University Berlin, 2017
+B.Sc. Business Administration — University of Mannheim, 2015
+
+SKILLS
+Product Management, Agile / Scrum, User Research, A/B Testing, SQL, Figma,
+JIRA, Confluence, Python (basic), Data Analysis, Stakeholder Management,
+API Products, FinTech, Open Banking, PSD2, Roadmap Planning
+
+LANGUAGES
+English (fluent), German (fluent), Mandarin (native)
+
+CERTIFICATIONS
+Pragmatic Institute — Product Management Certification, 2020

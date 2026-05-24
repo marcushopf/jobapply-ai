@@ -42,7 +42,7 @@ def candidate_dir(candidate_id: str) -> Path:
     return d
 
 
-def load_shortlisted_jobs(candidate_id: str, job_filter: str | None) -> list[dict]:
+def load_shortlisted_jobs(candidate_id: str, job_filter: str | None = None) -> list[dict]:
     details_dir = Path("data/candidates") / candidate_id / "job_screenings" / "details"
     if not details_dir.exists():
         sys.exit("No job screenings found. Run screen_jobs.py first.")

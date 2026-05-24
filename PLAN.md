@@ -101,6 +101,55 @@ jobapply-ai/
 | Runtime      | Python (CLI scripts)            |
 | CV parsing   | Claude API + pdfplumber / python-docx |
 
+## Testing Checklist
+
+> Run `make test` before every commit (unit tests, no LLM, fast).
+> Run `make test-integration` before any release (real Gemini calls).
+> Run `make test-e2e` for a full pipeline smoke-test (Alex Müller → N26 job).
+> UI testing is manual — use the Streamlit checklist below.
+
+### Unit Tests — `make test` (fast, no LLM)
+- [ ] `test_ingest.py` — candidate ID generation, text extraction
+- [ ] `test_screening.py` — score threshold, job ID, slugify, search queries
+- [ ] `test_format_cv.py` — role type detection, HTML output shape
+- [ ] `test_utils.py` — JSON fence stripping, stage rank order, wishlist parsing
+
+### Integration Tests — `make test-integration` (real Gemini API)
+- [ ] `test_gap_analysis.py` — gap schema valid, priorities valid, resolved=false
+- [ ] `test_applications.py` — cover letter length, no placeholders, company name present
+- [ ] `test_linkedin.py` — headline ≤220 chars, exactly 50 skills, About in first person
+
+### End-to-End — `make test-e2e` (full pipeline, ~5 min)
+- [ ] Stage 1: profile.json created with name, experience, skills
+- [ ] Stage 1b: wishlist.json saved
+- [ ] Stage 2: job scored 0–100, saved to job_screenings/details/
+- [ ] Stage 3: gap_report.json has ≥1 gap for Alex vs N26
+- [ ] Stage 4: interview enriches profile with interview_additions
+- [ ] Stage 4b: fit_report.json has fit_score 0–100
+- [ ] Stage 5: cover_letter.md + cv_tailored.md generated, mention N26
+- [ ] Stage 5b: cv_formatted.html valid, contains @media print
+- [ ] Stage 6: linkedin_profile.md has all sections, 50 skills, headline ≤220
+
+### Streamlit UI — manual checklist (run after any significant change)
+- [ ] API key setup page appears when no key in keychain
+- [ ] New candidate created from Home, appears in sidebar dropdown
+- [ ] CV file upload extracts profile correctly
+- [ ] Wishlist form saves all fields
+- [ ] Manual job add scores the job and shows shortlisted/skipped
+- [ ] Gap analysis runs and shows gaps by priority (🔴🟡🟢)
+- [ ] Interview chat advances one question at a time, skip button works
+- [ ] Fit report shows score bars per role
+- [ ] Applications generate with download buttons for cover letter + CV
+- [ ] Format CV produces HTML, download button works
+- [ ] LinkedIn profile generates all sections, download button works
+- [ ] Progress bar in sidebar updates at each stage
+
+### Multi-Candidate Isolation
+- [ ] Run pipeline for two candidates, verify no data crossover in tracker.json
+- [ ] Each candidate's applications/ folder contains only their own documents
+
+---
+
 ## Build Status
 
 > This is the single source of truth for project progress.
