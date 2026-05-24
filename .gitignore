@@ -4,6 +4,9 @@
 # All candidate data — kept local, never pushed
 data/
 
+# LLM response cache — rebuild with: make test-integration-refresh
+tests/fixtures/llm_cache/
+
 # Python
 *.pyc
 __pycache__/
