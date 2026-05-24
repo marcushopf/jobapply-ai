@@ -108,20 +108,34 @@ ROLE_GUIDANCE = {
 
 def detect_role_type(job_title: str, wishlist: dict) -> str:
     all_titles = [job_title] + wishlist.get("dream_jobs", []) + wishlist.get("also_open_to", [])
-    text = " ".join(all_titles).lower()
+    # Pad with spaces so boundary keywords like " vp " match at string start/end too
+    text = " " + " ".join(all_titles).lower() + " "
 
-    if any(k in text for k in ["product manager", " pm ", "head of product", "vp product",
-                                 "product director", "product lead", "chief product"]):
+    # Product — check before management so "VP of Product" is caught here
+    if any(k in text for k in ["product manager", " pm ", "head of product",
+                                 "vp of product", "vp product", "product director",
+                                 "product lead", "chief product"]):
         return "product"
-    if any(k in text for k in ["engineer", "developer", "software", "backend", "frontend",
-                                 "fullstack", "devops", "sre", "platform"]):
-        return "engineering"
-    if any(k in text for k in ["data scien", "machine learning", " ml ", " ai ", "analytics",
-                                 "analyst", "data lead", "data manager", "data director"]):
-        return "data"
-    if any(k in text for k in ["manager", "director", "head of", " vp ", "vice president",
-                                 "chief", " cto", " cpo", " cdo", "senior manager"]):
+
+    # Management — check before engineering/data so "Director of Engineering" → management
+    if any(k in text for k in ["senior manager", " director", "head of",
+                                 " vp ", "vp of", "vice president",
+                                 "chief ", " cto ", " cpo ", " cdo ",
+                                 " manager "]):
         return "management"
+
+    # Data/ML — check before engineering so "ML Engineer" → data
+    if any(k in text for k in ["data scien", "machine learning", " ml ",
+                                 " ai ", "data analyst", "data engineer",
+                                 "analytics", "data lead"]):
+        return "data"
+
+    # Engineering
+    if any(k in text for k in ["engineer", "developer", "software", "backend",
+                                 "frontend", "fullstack", "devops", " sre",
+                                 "platform"]):
+        return "engineering"
+
     return "general"
 
 

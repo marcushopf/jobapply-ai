@@ -55,7 +55,7 @@ def ask_choice(prompt: str, options: list[str], default: str = "") -> str:
         print(f"  Please choose one of: {opts}")
 
 
-def ask_int(prompt: str, default: int = None) -> int | None:
+def ask_int(prompt: str, default: int | None = None) -> int | None:
     suffix = f" [{default}]" if default is not None else " (leave blank to skip)"
     raw = input(f"{prompt}{suffix}: ").strip()
     if not raw:
