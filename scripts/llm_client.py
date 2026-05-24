@@ -2,12 +2,16 @@
 """
 LLM client — wraps LiteLLM with a single chat() interface.
 
-Key lookup order (for GOOGLE_API_KEY):
+Key lookup order:
   1. Environment variable / .env  — CI, power users
   2. OS keychain                  — returning users (silent)
   3. First-run prompt             — saves to keychain, never asked again
 
-Override model: set LLM_MODEL in .env
+Provider selection:
+  - Default (production): Google Gemini  (GOOGLE_API_KEY)
+  - Testing override:     Groq           (GROQ_API_KEY, set LLM_MODEL=groq/llama-3.1-8b-instant)
+
+Override model: set LLM_MODEL in .env or environment.
 """
 
 import getpass
@@ -21,17 +25,19 @@ litellm.suppress_debug_info = True
 
 _KEYCHAIN_SERVICE = "jobapply-ai"
 _GEMINI_MODEL = "gemini/gemini-2.0-flash"
+_GROQ_MODEL = "groq/llama-3.1-8b-instant"
 
 
-def _resolve_key(env_var: str, keychain_account: str, label: str, help_url: str) -> str:
+def _resolve_key(env_var: str, keychain_account: str, label: str, help_url: str,
+                 required: bool = True) -> str:
     """Three-step key lookup: env var → OS keychain → first-run prompt."""
 
-    # 1. Env var / .env (CI, overrides)
+    # 1. Env var / .env
     val = os.getenv(env_var, "").strip()
     if val:
         return val
 
-    # 2. OS keychain (macOS Keychain, Windows Credential Manager, Linux Secret Service)
+    # 2. OS keychain
     try:
         import keyring
         val = (keyring.get_password(_KEYCHAIN_SERVICE, keychain_account) or "").strip()
@@ -40,7 +46,10 @@ def _resolve_key(env_var: str, keychain_account: str, label: str, help_url: str)
     except Exception:
         pass
 
-    # 3. First-run prompt — save to keychain so this never runs again
+    if not required:
+        return ""
+
+    # 3. First-run prompt
     print(f"\n  No {label} found.")
     print(f"  Get your free key at: {help_url}\n")
     val = getpass.getpass(f"  Paste your {env_var}: ").strip()
@@ -58,17 +67,33 @@ def _resolve_key(env_var: str, keychain_account: str, label: str, help_url: str)
     return val
 
 
+def _setup_provider(model: str) -> str:
+    """Resolve API keys based on the chosen model and wire up env vars."""
+    if model.startswith("groq/"):
+        key = _resolve_key(
+            env_var="GROQ_API_KEY",
+            keychain_account="groq_api_key",
+            label="Groq API key",
+            help_url="https://console.groq.com/keys",
+        )
+        os.environ["GROQ_API_KEY"] = key
+        return "groq"
+
+    # Default: Gemini
+    key = _resolve_key(
+        env_var="GOOGLE_API_KEY",
+        keychain_account="google_api_key",
+        label="Google API key",
+        help_url="https://aistudio.google.com/apikey",
+    )
+    os.environ["GOOGLE_API_KEY"] = key
+    return "google"
+
+
 class LLMClient:
     def __init__(self):
-        key = _resolve_key(
-            env_var="GOOGLE_API_KEY",
-            keychain_account="google_api_key",
-            label="Google API key",
-            help_url="https://aistudio.google.com/apikey",
-        )
-        os.environ["GOOGLE_API_KEY"] = key  # make sure litellm picks it up
         self.model = os.getenv("LLM_MODEL", _GEMINI_MODEL)
-        self.provider = "google"
+        self.provider = _setup_provider(self.model)
 
     def chat(self, prompt: str, max_tokens: int = 1024, retries: int = 3) -> str:
         for attempt in range(retries):
@@ -82,8 +107,8 @@ class LLMClient:
             except Exception as e:
                 if "429" in str(e) and attempt < retries - 1:
                     wait = 65
-                    print(f"\n  Rate limited — waiting {wait}s before retry {attempt + 2}/{retries}...",
-                          flush=True)
+                    print(f"\n  Rate limited — waiting {wait}s before retry "
+                          f"{attempt + 2}/{retries}...", flush=True)
                     time.sleep(wait)
                 else:
                     raise
