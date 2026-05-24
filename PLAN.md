@@ -109,10 +109,10 @@ jobapply-ai/
 > UI testing is manual — use the Streamlit checklist below.
 
 ### Unit Tests — `make test` (fast, no LLM)
-- [ ] `test_ingest.py` — candidate ID generation, text extraction
-- [ ] `test_screening.py` — score threshold, job ID, slugify, search queries
-- [ ] `test_format_cv.py` — role type detection, HTML output shape
-- [ ] `test_utils.py` — JSON fence stripping, stage rank order, wishlist parsing
+- [x] `test_ingest.py` — candidate ID generation, text extraction
+- [x] `test_screening.py` — score threshold, job ID, slugify, search queries
+- [x] `test_format_cv.py` — role type detection, HTML output shape
+- [x] `test_utils.py` — JSON fence stripping, stage rank order, wishlist parsing
 
 ### Integration Tests — `make test-integration` (real Gemini API)
 - [ ] `test_gap_analysis.py` — gap schema valid, priorities valid, resolved=false
