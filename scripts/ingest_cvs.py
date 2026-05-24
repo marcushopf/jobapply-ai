@@ -23,7 +23,11 @@ import sys
 from datetime import date
 from pathlib import Path
 
-import anthropic
+import sys
+from pathlib import Path as _Path
+sys.path.insert(0, str(_Path(__file__).parent))
+
+from llm_client import LLMClient
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -75,8 +79,8 @@ def extract_text(file_path: Path) -> str:
 
 
 def parse_profile_with_claude(cv_texts: list[tuple[str, str]], candidate_name: str) -> dict:
-    """Send all CV texts to Claude and get back a structured profile."""
-    client = anthropic.Anthropic()
+    """Send all CV texts to the LLM and get back a structured profile."""
+    client = LLMClient()
 
     cv_blocks = "\n\n".join(
         f"--- CV: {filename} ---\n{text}" for filename, text in cv_texts
@@ -135,13 +139,7 @@ Return ONLY valid JSON matching this exact schema — no markdown, no explanatio
   "parsed_date": "{date.today().isoformat()}"
 }}"""
 
-    message = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=4096,
-        messages=[{"role": "user", "content": prompt}],
-    )
-
-    raw = message.content[0].text.strip()
+    raw = client.chat(prompt, max_tokens=4096).strip()
     # Strip markdown code fences if Claude added them
     if raw.startswith("```"):
         raw = re.sub(r"^```[a-z]*\n?", "", raw)
@@ -213,8 +211,8 @@ def main():
         text = extract_text(cv_path)
         cv_texts.append((cv_path.name, text))
 
-    # Parse with Claude
-    print("Parsing CVs with Claude...")
+    # Parse with LLM
+    print("Parsing CVs...")
     profile = parse_profile_with_claude(cv_texts, candidate_name)
     profile["cv_sources"] = [p.name for p in cv_paths]
 

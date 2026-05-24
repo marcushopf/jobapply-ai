@@ -27,18 +27,22 @@ runs a targeted interview to fill only the relevant gaps, then generates tailore
 - One question at a time during interviews
 - API keys stored in `.env` (never commit)
 
+## LLM Provider — Free Tier First
+**This project uses Google Gemini via LiteLLM as the sole LLM provider.**
+- All scripts import `LLMClient` from `scripts/llm_client.py` — never call Anthropic or any other provider directly
+- Default model: `gemini/gemini-2.0-flash` (free tier via Google AI Studio)
+- Do NOT add `anthropic` calls or suggest switching to Anthropic — the goal is a fully free pipeline
+- If a new script needs an LLM call, always use `LLMClient().chat(prompt, max_tokens=N)`
+- Override model via `LLM_MODEL` env var if needed
+
 ## Environment Variables (.env)
 ```
-ANTHROPIC_API_KEY=
-ADZUNA_APP_ID=
-ADZUNA_APP_KEY=
+GOOGLE_API_KEY=        # Required — get free key at https://aistudio.google.com/apikey
+SERPAPI_KEY=           # Required for job search (screen_jobs.py)
+LLM_MODEL=             # Optional — override default gemini/gemini-2.0-flash
 ```
 
 ## Current Next Step
-Build Stage 4: Targeted interview bot (`scripts/interview.py`)
-- Reads `gap_report.json` — only asks questions for unresolved gaps
-- One question at a time, conversational CLI
-- Saves answers back into `profile.json`
-- Flips `gap.resolved = true` after each answer
-- Saves session transcript to `candidates/[id]/interviews/session_NNN.md`
-- Updates `tracker.json` when done
+Build Stage 5b: ATS-safe CV formatting (`scripts/generate_application.py` already done).
+- Research best CV templates for PM / data / engineering roles
+- Role-aware Markdown → PDF pipeline (no design tool needed)

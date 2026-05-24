@@ -24,7 +24,11 @@ import sys
 from datetime import date
 from pathlib import Path
 
-import anthropic
+import sys
+from pathlib import Path as _Path
+sys.path.insert(0, str(_Path(__file__).parent))
+
+from llm_client import LLMClient
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -81,7 +85,7 @@ def save_tracker(candidate_id: str, tracker: dict):
 # Pass 1: per-job gap extraction
 # ---------------------------------------------------------------------------
 
-def extract_gaps_for_job(job: dict, profile: dict, client: anthropic.Anthropic) -> list[dict]:
+def extract_gaps_for_job(job: dict, profile: dict, client: LLMClient) -> list[dict]:
     """Ask Claude what's missing or underspecified in the profile for this specific job."""
 
     desc = job.get('description', '')
@@ -115,13 +119,7 @@ Return ONLY a JSON array, no explanation:
 
 Return an empty array [] if the profile already covers this job well."""
 
-    message = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=1024,
-        messages=[{"role": "user", "content": prompt}],
-    )
-
-    raw = strip_fences(message.content[0].text)
+    raw = strip_fences(client.chat(prompt, max_tokens=1024))
     return json.loads(raw)
 
 
@@ -133,7 +131,7 @@ def synthesise_gap_report(
     raw_gaps_by_job: list[dict],
     profile: dict,
     wishlist: dict,
-    client: anthropic.Anthropic,
+    client: LLMClient,
 ) -> list[dict]:
     """Deduplicate and prioritise raw per-job gaps into a final interview-ready list."""
 
@@ -165,13 +163,7 @@ Return ONLY a JSON array, no explanation. Each item:
 
 Order by priority descending (high first). Use gap_001, gap_002, ... IDs."""
 
-    message = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=2048,
-        messages=[{"role": "user", "content": prompt}],
-    )
-
-    raw = strip_fences(message.content[0].text)
+    raw = strip_fences(client.chat(prompt, max_tokens=2048))
     return json.loads(raw)
 
 
@@ -192,7 +184,7 @@ def main():
     wishlist = json.loads(wishlist_path.read_text()) if wishlist_path.exists() else {}
 
     jobs = load_shortlisted_jobs(candidate_id)
-    client = anthropic.Anthropic()
+    client = LLMClient()
 
     print(f"Candidate: {profile.get('name', candidate_id)}")
     print(f"Shortlisted jobs to analyse: {len(jobs)}\n")

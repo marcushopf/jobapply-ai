@@ -18,7 +18,11 @@ import sys
 from datetime import date, datetime
 from pathlib import Path
 
-import anthropic
+import sys
+from pathlib import Path as _Path
+sys.path.insert(0, str(_Path(__file__).parent))
+
+from llm_client import LLMClient
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -66,7 +70,7 @@ def strip_fences(text: str) -> str:
 # ---------------------------------------------------------------------------
 
 def extract_profile_update(gap: dict, answer: str, profile: dict,
-                            client: anthropic.Anthropic) -> dict:
+                            client: LLMClient) -> dict:
     prompt = f"""You are enriching a job candidate's profile from an interview answer.
 
 Gap:
@@ -86,13 +90,7 @@ Extract the key information from this answer. Return ONLY valid JSON:
   "evidence": "Specific facts, metrics, or examples from the answer (verbatim where possible)"
 }}"""
 
-    message = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=512,
-        messages=[{"role": "user", "content": prompt}],
-    )
-
-    raw = strip_fences(message.content[0].text)
+    raw = strip_fences(client.chat(prompt, max_tokens=512))
     return json.loads(raw)
 
 
@@ -154,7 +152,7 @@ def main():
     interviews_dir.mkdir(exist_ok=True)
     session_num = next_session_number(interviews_dir)
 
-    client = anthropic.Anthropic()
+    client = LLMClient()
 
     transcript = [
         f"# Interview Session {session_num:03d}",
