@@ -13,6 +13,7 @@ Override model: set LLM_MODEL in .env
 import getpass
 import os
 import sys
+import time
 
 import litellm
 
@@ -69,10 +70,20 @@ class LLMClient:
         self.model = os.getenv("LLM_MODEL", _GEMINI_MODEL)
         self.provider = "google"
 
-    def chat(self, prompt: str, max_tokens: int = 1024) -> str:
-        response = litellm.completion(
-            model=self.model,
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=max_tokens,
-        )
-        return response.choices[0].message.content
+    def chat(self, prompt: str, max_tokens: int = 1024, retries: int = 3) -> str:
+        for attempt in range(retries):
+            try:
+                response = litellm.completion(
+                    model=self.model,
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=max_tokens,
+                )
+                return response.choices[0].message.content
+            except Exception as e:
+                if "429" in str(e) and attempt < retries - 1:
+                    wait = 65
+                    print(f"\n  Rate limited — waiting {wait}s before retry {attempt + 2}/{retries}...",
+                          flush=True)
+                    time.sleep(wait)
+                else:
+                    raise
