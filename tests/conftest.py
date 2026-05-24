@@ -15,8 +15,9 @@ from pathlib import Path
 
 import pytest
 
-# Make scripts importable
+# Make scripts and tests/ importable
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
+sys.path.insert(0, str(Path(__file__).parent))
 
 from dotenv import load_dotenv
 load_dotenv()

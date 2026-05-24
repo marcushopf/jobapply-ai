@@ -177,7 +177,7 @@ jobapply-ai/
 > Items graduate here from IDEAS.md once scoped and prioritised.
 > Each improvement gets a checkbox when done.
 
-- [ ] _(next improvement — promote from IDEAS.md)_
+- [ ] **Claude CLI provider** — add `claude-cli` to `llm_client.py` (subprocess call to `claude -p`). Env var: `LLM_PROVIDER=claude-cli`. Unlocks unlimited free integration + Streamlit UI testing via Claude Code Pro subscription. No extra API keys needed. → See IDEAS.md for full detail.
 
 ---
 
