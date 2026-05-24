@@ -28,21 +28,25 @@ runs a targeted interview to fill only the relevant gaps, then generates tailore
 - API keys stored in `.env` (never commit)
 
 ## LLM Provider — Free Tier First
-**This project uses Google Gemini via LiteLLM as the sole LLM provider.**
-- All scripts import `LLMClient` from `scripts/llm_client.py` — never call Anthropic or any other provider directly
-- Default model: `gemini/gemini-2.0-flash` (free tier via Google AI Studio)
-- Do NOT add `anthropic` calls or suggest switching to Anthropic — the goal is a fully free pipeline
+**Production: Google Gemini. Testing: Groq.**
+- All scripts use `LLMClient` from `scripts/llm_client.py` — never call Anthropic or any other provider directly
+- Production default: `gemini/gemini-2.0-flash` (15 RPM, 1,500 RPD)
+- Testing default: `groq/llama-3.1-8b-instant` (30 RPM, 14,400 RPD — 10× quota, much faster)
+- Do NOT add `anthropic` calls — the goal is a fully free pipeline
 - If a new script needs an LLM call, always use `LLMClient().chat(prompt, max_tokens=N)`
-- Override model via `LLM_MODEL` env var if needed
+- Override model via `LLM_MODEL` env var; override test model via `TEST_LLM_MODEL`
 
 ## Environment Variables (.env)
 ```
-GOOGLE_API_KEY=        # Required — get free key at https://aistudio.google.com/apikey
+GOOGLE_API_KEY=        # Required for production — https://aistudio.google.com/apikey
+GROQ_API_KEY=          # Required for testing   — https://console.groq.com/keys  (free)
 SERPAPI_KEY=           # Required for job search (screen_jobs.py)
-LLM_MODEL=             # Optional — override default gemini/gemini-2.0-flash
+LLM_MODEL=             # Optional — override production model
+TEST_LLM_MODEL=        # Optional — override model used when rebuilding test cache
 ```
 
 ## Current Next Step
-Build Stage 5b: ATS-safe CV formatting (`scripts/generate_application.py` already done).
-- Research best CV templates for PM / data / engineering roles
-- Role-aware Markdown → PDF pipeline (no design tool needed)
+All 6 stages built. Testing infrastructure in place (53 unit tests passing).
+- Get Groq API key, run `make test-integration-refresh` to populate LLM cache
+- Then run `make test-integration` for fast repeated testing
+- Privacy audit still pending (see PLAN.md)

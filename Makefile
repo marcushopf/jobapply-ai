@@ -1,7 +1,7 @@
 VENV = .venv/bin
 PYTEST = $(VENV)/pytest
 
-.PHONY: test test-integration test-integration-refresh test-e2e test-all install
+.PHONY: test test-integration test-integration-refresh test-integration-refresh-gemini test-e2e test-all install
 
 ## Fast unit tests — no LLM, no network. Run these constantly.
 test:
@@ -11,9 +11,13 @@ test:
 test-integration:
 	$(PYTEST) tests/integration/ -v
 
-## Integration tests — forces fresh Gemini API calls and rebuilds cache.
-## Run this when prompts or logic change, not on every commit.
+## Rebuild cache using Groq (fast, free, 14,400 calls/day — recommended).
+## Get free key at https://console.groq.com/keys then: keyring set jobapply-ai groq_api_key
 test-integration-refresh:
+	REFRESH_LLM_CACHE=1 TEST_LLM_MODEL=groq/llama-3.1-8b-instant $(PYTEST) tests/integration/ -v -s
+
+## Rebuild cache using Gemini (production model, slower quota).
+test-integration-refresh-gemini:
 	REFRESH_LLM_CACHE=1 $(PYTEST) tests/integration/ -v -s
 
 ## Full end-to-end pipeline for Sarah Chen (all 6 stages). Slow.

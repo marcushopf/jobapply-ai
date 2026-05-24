@@ -32,10 +32,15 @@ class CachedLLMClient:
     the response. Every subsequent run loads from cache — no API key needed,
     no quota burned, deterministic results.
 
+    Model selection for cache refresh:
+      - Set TEST_LLM_MODEL=groq/llama-3.1-8b-instant for fast, free Groq calls
+      - Falls back to LLM_MODEL, then Gemini default
+
     Usage:
-        client = CachedLLMClient()          # uses cache when available
+        client = CachedLLMClient()              # uses cache when available
         client = CachedLLMClient(refresh=True)  # forces fresh API call
-        REFRESH_LLM_CACHE=1 pytest ...      # same via env var
+        REFRESH_LLM_CACHE=1 pytest ...          # same via env var
+        TEST_LLM_MODEL=groq/llama-3.1-8b-instant REFRESH_LLM_CACHE=1 pytest ...
     """
 
     def __init__(self, refresh: bool = False):
@@ -45,6 +50,10 @@ class CachedLLMClient:
 
     def _real_client(self):
         if self._real is None:
+            # TEST_LLM_MODEL overrides LLM_MODEL during cache refresh
+            test_model = os.getenv("TEST_LLM_MODEL", "").strip()
+            if test_model:
+                os.environ["LLM_MODEL"] = test_model
             from llm_client import LLMClient
             self._real = LLMClient()
         return self._real
