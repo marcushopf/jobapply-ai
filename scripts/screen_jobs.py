@@ -29,7 +29,11 @@ import sys
 from datetime import date
 from pathlib import Path
 
-import anthropic
+import sys
+from pathlib import Path as _Path
+sys.path.insert(0, str(_Path(__file__).parent))
+
+from llm_client import LLMClient
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -215,7 +219,7 @@ def get_manual_job() -> dict:
 # Scoring
 # ---------------------------------------------------------------------------
 
-def score_job(job: dict, profile: dict, wishlist: dict, client: anthropic.Anthropic) -> tuple[int, str]:
+def score_job(job: dict, profile: dict, wishlist: dict, client: LLMClient) -> tuple[int, str]:
     """Score a job against a candidate profile using Claude. Returns (score, reasoning)."""
 
     prompt = f"""You are scoring a job listing against a candidate profile and their wishlist.
@@ -244,13 +248,7 @@ Return ONLY valid JSON, no explanation:
   "reasoning": "Strong skills match in X and Y. Experience level fits. Location matches preference. Missing Z which is listed as required."
 }}"""
 
-    message = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=512,
-        messages=[{"role": "user", "content": prompt}],
-    )
-
-    raw = message.content[0].text.strip()
+    raw = client.chat(prompt, max_tokens=512).strip()
     if raw.startswith("```"):
         raw = re.sub(r"^```[a-z]*\n?", "", raw)
         raw = re.sub(r"\n?```$", "", raw)
@@ -277,7 +275,7 @@ def main():
     wishlist = load_wishlist(candidate_id)
     tracker = load_tracker(candidate_id)
     log = load_screening_log(candidate_id)
-    client = anthropic.Anthropic()
+    client = LLMClient()
 
     if not wishlist:
         print("No wishlist found. It's recommended to set one up first:")

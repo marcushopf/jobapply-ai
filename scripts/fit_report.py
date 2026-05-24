@@ -20,7 +20,11 @@ import sys
 from datetime import date
 from pathlib import Path
 
-import anthropic
+import sys
+from pathlib import Path as _Path
+sys.path.insert(0, str(_Path(__file__).parent))
+
+from llm_client import LLMClient
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -68,7 +72,7 @@ def probability_label(score: int) -> str:
 # ---------------------------------------------------------------------------
 
 def score_job_title(title: str, profile: dict, wishlist: dict,
-                    client: anthropic.Anthropic) -> dict:
+                    client: LLMClient) -> dict:
     """Score candidate fitness for a generic job title (not a specific listing)."""
 
     prompt = f"""You are a senior recruiter assessing a candidate's fit for a job title.
@@ -102,13 +106,7 @@ Return ONLY valid JSON, no explanation:
 
 Be honest and specific. fit_score is 0-100. reply_probability is one of: high, medium, low, very low."""
 
-    message = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=1024,
-        messages=[{"role": "user", "content": prompt}],
-    )
-
-    raw = message.content[0].text.strip()
+    raw = client.chat(prompt, max_tokens=1024).strip()
     if raw.startswith("```"):
         raw = re.sub(r"^```[a-z]*\n?", "", raw)
         raw = re.sub(r"\n?```$", "", raw)
@@ -117,7 +115,7 @@ Be honest and specific. fit_score is 0-100. reply_probability is one of: high, m
 
 
 def dream_job_deep_analysis(dream_title: str, profile: dict, wishlist: dict,
-                             fit: dict, client: anthropic.Anthropic) -> dict:
+                             fit: dict, client: LLMClient) -> dict:
     """Deep analysis for the candidate's #1 dream job."""
 
     prompt = f"""You are a senior career coach doing a deep assessment for a candidate's dream job.
@@ -161,13 +159,7 @@ Return ONLY valid JSON:
   "motivational_note": "One honest, encouraging sentence for the candidate."
 }}"""
 
-    message = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=2048,
-        messages=[{"role": "user", "content": prompt}],
-    )
-
-    raw = message.content[0].text.strip()
+    raw = client.chat(prompt, max_tokens=2048).strip()
     if raw.startswith("```"):
         raw = re.sub(r"^```[a-z]*\n?", "", raw)
         raw = re.sub(r"\n?```$", "", raw)
@@ -195,7 +187,7 @@ def main():
         print("No wishlist found. Run setup_wishlist.py first for best results.")
         print("Continuing with profile data only...\n")
 
-    client = anthropic.Anthropic()
+    client = LLMClient()
 
     # Collect all target titles
     all_titles = wishlist.get("dream_jobs", []) + wishlist.get("also_open_to", [])
