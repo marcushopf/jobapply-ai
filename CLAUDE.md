@@ -46,7 +46,18 @@ TEST_LLM_MODEL=        # Optional — override model used when rebuilding test c
 ```
 
 ## Current Next Step
-All 6 stages built. Testing infrastructure in place (53 unit tests passing).
-- Get Groq API key, run `make test-integration-refresh` to populate LLM cache
-- Then run `make test-integration` for fast repeated testing
-- Privacy audit still pending (see PLAN.md)
+All 6 stages built + Streamlit UI. Testing infrastructure in place (53 unit tests passing).
+
+**START HERE TOMORROW — Claude CLI provider (unlocks unlimited free testing):**
+1. Add a `claude-cli` provider to `scripts/llm_client.py` that shells out to `claude -p "prompt"` via subprocess
+2. Add env var `LLM_PROVIDER=claude-cli` (or `TEST_LLM_PROVIDER=claude-cli`) to `.env`
+3. Verify integration tests pass with this provider: `make test-integration`
+4. Verify the Streamlit UI works end-to-end using this provider (run `streamlit run app.py`)
+5. Once claude-cli testing confirms the full pipeline works, get Groq API key as the production-testing default
+
+**Why:** Marcus has Claude Code Pro subscription — `claude` CLI is already installed and authenticated, zero extra API keys needed, unlimited calls. This unblocks all integration + UI testing immediately.
+
+**Streamlit UI connection idea:** The Streamlit app already calls all scripts via `llm_client.py`. Setting `LLM_PROVIDER=claude-cli` in `.env` before launching `streamlit run app.py` should make the entire UI use the claude-cli provider automatically — no UI changes needed.
+
+**After that:**
+- Privacy audit — verify `.gitignore` covers all PII (see PLAN.md)

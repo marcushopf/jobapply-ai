@@ -10,7 +10,8 @@
 
 <!-- Add new ideas below. Format: idea, why it matters, rough effort (small/medium/large) -->
 
-- [ ] **Multi-provider LLM support** — create `scripts/llm_client.py` factory to toggle between Anthropic and Google Gemini (free tier) via environment variables. (Medium)
+- [ ] **Claude CLI provider for testing** — add a `claude-cli` provider to `llm_client.py` that shells out to `claude -p "prompt"` via subprocess. Set via `LLM_PROVIDER=claude-cli` in `.env`. Unlocks unlimited free integration + Streamlit UI testing using Marcus's Claude Code Pro subscription — no Groq or Gemini key needed. Since all scripts and the Streamlit app go through `llm_client.py`, setting the env var before `streamlit run app.py` makes the full UI use Claude CLI automatically. (Small)
+- [ ] **Multi-provider LLM support** — create `scripts/llm_client.py` factory to toggle between Anthropic and Google Gemini (free tier) via environment variables. (Medium — partially done via LiteLLM)
 - [ ] Integrate LinkedIn Learning / course content to strengthen interview answers and CV language
 - [ ] Auto-detect tone of a job description (formal/startup/corporate) and match cover letter tone
 - [ ] Add a "rejection analyser" — if a candidate gets rejected, learn from the pattern
