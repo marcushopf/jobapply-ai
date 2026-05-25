@@ -1,7 +1,7 @@
 VENV = .venv/bin
 PYTEST = $(VENV)/pytest
 
-.PHONY: test test-integration test-integration-refresh test-integration-refresh-gemini test-e2e test-all install
+.PHONY: test test-integration test-integration-refresh-ollama test-integration-refresh-gemini test-e2e test-all install
 
 ## Fast unit tests — no LLM, no network. Run these constantly.
 test:
@@ -11,10 +11,10 @@ test:
 test-integration:
 	$(PYTEST) tests/integration/ -v
 
-## Rebuild cache using Groq (fast, free, 14,400 calls/day — recommended).
-## Get free key at https://console.groq.com/keys then: keyring set jobapply-ai groq_api_key
-test-integration-refresh:
-	REFRESH_LLM_CACHE=1 TEST_LLM_MODEL=groq/llama-3.1-8b-instant $(PYTEST) tests/integration/ -v -s
+## Rebuild cache using Ollama (local, unlimited — requires: ollama serve).
+## Uses ollama/auto to pick the best model for your hardware automatically.
+test-integration-refresh-ollama:
+	REFRESH_LLM_CACHE=1 TEST_LLM_MODEL=ollama/auto $(PYTEST) tests/integration/ -v -s
 
 ## Rebuild cache using Gemini (production model, slower quota).
 test-integration-refresh-gemini:

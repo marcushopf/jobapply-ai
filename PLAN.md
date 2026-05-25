@@ -7,6 +7,30 @@ Upload CVs → Parse Profile → Fill Wishlist → Screen & Shortlist Jobs →
 Gap Analysis → Targeted Interview → Fit Report → Generate Applications → Track
 ```
 
+## Strategic TODO — Competitive Landscape Check
+
+> **IMPORTANT — Do this before building further features.**
+> If an existing tool already covers the full jobapply-ai pipeline, we may not need to keep building.
+
+- [ ] Re-evaluate competitive landscape every major milestone — verify no tool has shipped the full pipeline since last check (last checked: 2026-05-25, see `IDEAS.md` or below)
+
+### Top 10 Competing Tools & Key Gaps vs. jobapply-ai (as of 2026-05-25)
+
+| # | Tool | What it does | Critical gap vs. jobapply-ai |
+|---|------|-------------|-------------------------------|
+| 1 | [AIApply](https://aiapply.co) | Tailors resume + cover letter per job; Chrome ext for LinkedIn Easy Apply; auto-apply | No gap analysis, no gap-driven interview, no fit report, no multi-candidate, SaaS (data on their servers) |
+| 2 | [JobCopilot](https://jobcopilot.com) | Auto-applies to 300K+ company sites; learns your answers over time | No gap analysis, no interview bot, no fit report, single candidate only, SaaS subscription |
+| 3 | [LoopCV](https://loopcv.pro) | Auto-applies to 1,000+ jobs across 20+ boards; A/B tests CVs | Mass-apply (quantity > quality), no gap analysis, no interview, no fit report, SaaS |
+| 4 | [Wobo](https://wobo.ai) | AI personal recruiter — finds and applies for jobs automatically | Single-candidate focus, no gap analysis, no interview bot, no fit report, SaaS ($25–54/mo) |
+| 5 | [Teal](https://tealhq.com) | ATS resume builder; 15-point resume analysis vs. JD; job tracker | No auto-apply, no gap analysis, no interview, no multi-candidate, SaaS |
+| 6 | [Jobscan](https://jobscan.co) | ATS keyword gap analysis; match rate score per resume+JD pair | Keyword-only (no semantic gap analysis), no job discovery, no interview, no application generation |
+| 7 | [Careerflow](https://careerflow.ai) | LinkedIn optimizer + ATS resume + mock interviews + auto-apply | Mock interviews are generic (not derived from actual job gaps), no fit report, no multi-candidate, SaaS |
+| 8 | [LazyApply](https://lazyapply.com) | One-click auto-fill on LinkedIn/Indeed at scale | Pure form-filling automation — no tailoring per JD, no gap analysis, no interview |
+| 9 | [LiftmyCV](https://liftmycv.com) | Chrome extension: LinkedIn auto-apply + cover letter generator | Browser extension only, no pipeline, no gap analysis, no gap-driven interview, single candidate |
+| 10 | [AutoApplier](https://autoapplier.com) | Browser agent that opens sites, fills forms, uploads resume | Pure application automation — no gap analysis, no interview, no quality tailoring at JD level |
+
+**Verdict (2026-05-25):** No existing tool covers the full jobapply-ai pipeline. The closest are AIApply (document generation) + Careerflow (LinkedIn + generic mock interviews) used together — still missing gap-driven interview, fit report, and free local operation. Safe to keep building. See `MARKETING.md` for full USP analysis and positioning.
+
 ## Stages
 
 ### Stage 1: CV Ingestion & Profile Extraction
@@ -150,6 +174,17 @@ jobapply-ai/
 
 ---
 
+## TODO: Marketing & Positioning — after testing is complete
+
+> Not a priority now. Tackle once integration + e2e tests are green and the tool is stable.
+
+- [ ] Review and finalise `MARKETING.md` — pitch, USP ranking, target audience
+- [ ] Rewrite README headline around the one-sentence pitch
+- [ ] Decide distribution: Docker image vs. hosted Streamlit vs. CLI-only for technical users
+- [ ] Set up a simple landing page or GitHub Pages site
+
+---
+
 ## Build Status
 
 > This is the single source of truth for project progress.
@@ -171,7 +206,7 @@ jobapply-ai/
 - [x] Streamlit UI — full web interface wrapping all stages (`app.py`)
 - [x] Stage 5b: CV template & ATS-safe formatting — role-aware reformat → clean HTML → print to PDF (`scripts/format_cv.py`)
 - [x] Stage 6: LinkedIn profile optimiser — headline, About, 50 skills, experience rewrites, Open to Work settings (`scripts/linkedin_profile.py`) → `candidates/[id]/linkedin_profile.md`
-- [ ] Privacy audit — verify `.gitignore` covers all personal data (`data/`, CVs, profiles, gap reports, interview transcripts, applications); confirm no PII has ever been committed to GitHub
+- [x] Privacy audit — `data/` gitignored, no PII ever committed; added `*.pdf/*.docx/*.doc` safety net to `.gitignore`
 
 ### Phase 2 — Continuous Improvement
 > Items graduate here from IDEAS.md once scoped and prioritised.

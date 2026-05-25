@@ -59,10 +59,13 @@ def next_session_number(interviews_dir: Path) -> int:
 
 
 def strip_fences(text: str) -> str:
-    if text.startswith("```"):
-        text = re.sub(r"^```[a-z]*\n?", "", text)
-        text = re.sub(r"\n?```$", "", text)
-    return text.strip()
+    text = re.sub(r"^```[a-z]*\n?", "", text.strip())
+    text = re.sub(r"\n?```$", "", text).strip()
+    for start, end in [("[", "]"), ("{", "}")]:
+        s, e = text.find(start), text.rfind(end)
+        if s != -1 and e > s:
+            return text[s:e + 1]
+    return text
 
 
 # ---------------------------------------------------------------------------
