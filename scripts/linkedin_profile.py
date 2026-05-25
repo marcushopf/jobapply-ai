@@ -43,10 +43,13 @@ def candidate_dir(candidate_id: str) -> Path:
 
 def strip_fences(text: str) -> str:
     import re
-    if text.startswith("```"):
-        text = re.sub(r"^```[a-z]*\n?", "", text)
-        text = re.sub(r"\n?```$", "", text)
-    return text.strip()
+    text = re.sub(r"^```[a-z]*\n?", "", text.strip())
+    text = re.sub(r"\n?```$", "", text).strip()
+    for start, end in [("[", "]"), ("{", "}")]:
+        s, e = text.find(start), text.rfind(end)
+        if s != -1 and e > s:
+            return text[s:e + 1]
+    return text
 
 
 # ---------------------------------------------------------------------------
@@ -112,15 +115,33 @@ Target industries: {', '.join(wishlist.get('target_industries', []))}
 Experience: {json.dumps([{k: e.get(k) for k in ['title', 'company', 'description']} for e in profile.get('experience', [])[:4]], indent=2)[:2000]}
 
 Rules:
-- Return exactly 50 skills
+- Return at least 60 skills (we will trim to 50, so generate more than enough)
 - Mix: hard skills (tools, methods, technologies) + soft skills + domain knowledge
 - Prioritise skills that match the target roles and show up in job descriptions
 - Order: most important/differentiating first
 - Return ONLY a JSON array of strings, no explanation:
 ["Skill 1", "Skill 2", ...]"""
 
-    raw = strip_fences(client.chat(prompt, max_tokens=512))
-    return json.loads(raw)
+    raw = strip_fences(client.chat(prompt, max_tokens=2048))
+    skills = json.loads(raw)
+
+    # Top-up if the model returned fewer than 50
+    if len(skills) < 50:
+        needed = 50 - len(skills)
+        existing_lower = {s.lower() for s in skills}
+        topup_prompt = (
+            f"Generate {needed + 10} more unique LinkedIn skills for a {', '.join(target_titles[:2])} "
+            f"that are NOT already in this list: {json.dumps(skills)}. "
+            f"Return ONLY a JSON array of strings."
+        )
+        try:
+            extra_raw = strip_fences(client.chat(topup_prompt, max_tokens=512))
+            extras = [s for s in json.loads(extra_raw) if s.lower() not in existing_lower]
+            skills = skills + extras
+        except Exception:
+            pass
+
+    return skills[:50]
 
 
 def generate_experience_descriptions(profile: dict, wishlist: dict,

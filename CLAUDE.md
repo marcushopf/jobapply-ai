@@ -28,36 +28,34 @@ runs a targeted interview to fill only the relevant gaps, then generates tailore
 - API keys stored in `.env` (never commit)
 
 ## LLM Provider — Free Tier First
-**Production: Google Gemini. Testing: Groq.**
-- All scripts use `LLMClient` from `scripts/llm_client.py` — never call Anthropic or any other provider directly
+**Production: Google Gemini. Testing: Ollama (local, unlimited).**
+- All scripts use `LLMClient` from `scripts/llm_client.py` — never call any provider directly
 - Production default: `gemini/gemini-2.0-flash` (15 RPM, 1,500 RPD)
-- Testing default: `groq/llama-3.1-8b-instant` (30 RPM, 14,400 RPD — 10× quota, much faster)
-- Do NOT add `anthropic` calls — the goal is a fully free pipeline
+- Testing default: `ollama/llama3.2` — local, unlimited, no API key needed
+- Rate-limit fallback: if Gemini hits 15 RPM, LLMClient automatically routes to Ollama (no wait)
+- Do NOT add `anthropic` or `groq` calls — the goal is a fully free pipeline
 - If a new script needs an LLM call, always use `LLMClient().chat(prompt, max_tokens=N)`
 - Override model via `LLM_MODEL` env var; override test model via `TEST_LLM_MODEL`
 
 ## Environment Variables (.env)
 ```
 GOOGLE_API_KEY=        # Required for production — https://aistudio.google.com/apikey
-GROQ_API_KEY=          # Required for testing   — https://console.groq.com/keys  (free)
 SERPAPI_KEY=           # Required for job search (screen_jobs.py)
-LLM_MODEL=             # Optional — override production model
+LLM_MODEL=             # Optional — override production model (e.g. ollama/llama3.2 for local)
+LLM_FALLBACK_MODEL=    # Optional — Ollama model for rate-limit fallback (default: ollama/llama3.2)
+OLLAMA_BASE_URL=       # Optional — default http://localhost:11434
 TEST_LLM_MODEL=        # Optional — override model used when rebuilding test cache
 ```
 
 ## Current Next Step
-All 6 stages built + Streamlit UI. Testing infrastructure in place (53 unit tests passing).
+All tests green: 53 unit + 31 integration. Ollama provider fully working. Privacy audit done.
 
-**START HERE TOMORROW — Claude CLI provider (unlocks unlimited free testing):**
-1. Add a `claude-cli` provider to `scripts/llm_client.py` that shells out to `claude -p "prompt"` via subprocess
-2. Add env var `LLM_PROVIDER=claude-cli` (or `TEST_LLM_PROVIDER=claude-cli`) to `.env`
-3. Verify integration tests pass with this provider: `make test-integration`
-4. Verify the Streamlit UI works end-to-end using this provider (run `streamlit run app.py`)
-5. Once claude-cli testing confirms the full pipeline works, get Groq API key as the production-testing default
+**START HERE:**
+1. `make test-e2e` — run full pipeline for Alex Müller (Stages 1–6). Has never been run end-to-end.
+2. `streamlit run app.py` — manual UI walkthrough using the checklist in PLAN.md
+3. Phase 2 improvements — see IDEAS.md and PLAN.md Phase 2 section
 
-**Why:** Marcus has Claude Code Pro subscription — `claude` CLI is already installed and authenticated, zero extra API keys needed, unlimited calls. This unblocks all integration + UI testing immediately.
-
-**Streamlit UI connection idea:** The Streamlit app already calls all scripts via `llm_client.py`. Setting `LLM_PROVIDER=claude-cli` in `.env` before launching `streamlit run app.py` should make the entire UI use the claude-cli provider automatically — no UI changes needed.
-
-**After that:**
-- Privacy audit — verify `.gitignore` covers all PII (see PLAN.md)
+**Ollama setup (if server not running):**
+- `ollama serve &` — start in background
+- `ollama pull qwen2.5:7b` — best model for M5 16GB
+- Set `LLM_MODEL=ollama/auto` in `.env` for local testing

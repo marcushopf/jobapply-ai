@@ -4,6 +4,11 @@
 # All candidate data — kept local, never pushed
 data/
 
+# Safety net — block CV/doc files from being accidentally committed anywhere
+*.pdf
+*.docx
+*.doc
+
 # LLM response cache — rebuild with: make test-integration-refresh
 tests/fixtures/llm_cache/
 

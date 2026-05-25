@@ -69,10 +69,24 @@ def load_shortlisted_jobs(candidate_id: str) -> list[dict]:
 
 
 def strip_fences(text: str) -> str:
-    if text.startswith("```"):
-        text = re.sub(r"^```[a-z]*\n?", "", text)
-        text = re.sub(r"\n?```$", "", text)
-    return text.strip()
+    text = re.sub(r"^```[a-z]*\n?", "", text.strip())
+    text = re.sub(r"\n?```$", "", text).strip()
+    for start, end in [("[", "]"), ("{", "}")]:
+        s, e = text.find(start), text.rfind(end)
+        if s != -1 and e > s:
+            return text[s:e + 1]
+    return text
+
+
+_VALID_CATEGORIES = {"metrics", "skills", "experience", "preferences", "soft_skills"}
+
+
+def _normalise_category(cat: str) -> str:
+    """Return the first valid category token from a model response like 'experience | soft_skills'."""
+    for token in re.split(r"[|,/\s]+", cat):
+        if token.strip().lower() in _VALID_CATEGORIES:
+            return token.strip().lower()
+    return cat
 
 
 def save_tracker(candidate_id: str, tracker: dict):
@@ -111,7 +125,7 @@ Do NOT flag things the candidate clearly has.
 Return ONLY a JSON array, no explanation:
 [
   {{
-    "category": "metrics | skills | experience | preferences | soft_skills",
+    "category": "EXACTLY ONE OF: metrics, skills, experience, preferences, soft_skills",
     "description": "Brief description of what is missing or underspecified",
     "raw_question": "The specific question to ask the candidate to fill this gap"
   }}
@@ -120,7 +134,11 @@ Return ONLY a JSON array, no explanation:
 Return an empty array [] if the profile already covers this job well."""
 
     raw = strip_fences(client.chat(prompt, max_tokens=1024))
-    return json.loads(raw)
+    gaps = json.loads(raw)
+    for g in gaps:
+        if "category" in g:
+            g["category"] = _normalise_category(g["category"])
+    return gaps
 
 
 # ---------------------------------------------------------------------------
@@ -150,21 +168,26 @@ Raw gaps per job:
 Candidate Profile (for context):
 {json.dumps(profile, indent=2)}
 
-Return ONLY a JSON array, no explanation. Each item:
+Return ONLY a JSON array, no explanation. Each item MUST have ALL of these fields:
 {{
   "gap_id": "gap_001",
-  "category": "metrics | skills | experience | preferences | soft_skills",
+  "category": "EXACTLY ONE OF: metrics, skills, experience, preferences, soft_skills",
   "description": "Clear description of what is missing",
   "affected_jobs": ["job_001", "job_003"],
   "question": "Specific, open-ended interview question to fill this gap",
-  "priority": "high | medium | low",
+  "priority": "EXACTLY ONE OF: high, medium, low",
   "resolved": false
 }}
+IMPORTANT: "resolved" must always be present and set to false.
 
 Order by priority descending (high first). Use gap_001, gap_002, ... IDs."""
 
     raw = strip_fences(client.chat(prompt, max_tokens=2048))
-    return json.loads(raw)
+    report = json.loads(raw)
+    for g in report:
+        if "category" in g:
+            g["category"] = _normalise_category(g["category"])
+    return report
 
 
 # ---------------------------------------------------------------------------
