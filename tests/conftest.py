@@ -24,7 +24,7 @@ load_dotenv()
 
 # ── Constants ──────────────────────────────────────────────────────────────
 
-TEST_CANDIDATE_ID = "test_alex_muller"
+TEST_CANDIDATE_ID = "test_alex_mueller"
 TEST_CANDIDATE_NAME = "Alex Müller"
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 DATA_DIR = Path("data/candidates")

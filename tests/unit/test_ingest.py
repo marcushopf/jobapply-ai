@@ -14,7 +14,7 @@ class TestCandidateIdFromName:
         assert candidate_id_from_name("Jane Doe") == "jane_doe"
 
     def test_name_with_title(self):
-        assert candidate_id_from_name("Dr. Alex Müller") == "dr_alex_muller"
+        assert candidate_id_from_name("Dr. Alex Müller") == "dr_alex_m_ller"
 
     def test_extra_spaces(self):
         assert candidate_id_from_name("  Anna  Müller  ") == "anna_m_ller"
@@ -33,7 +33,7 @@ class TestExtractText:
     def test_txt_file(self):
         cv_path = FIXTURES_DIR / "cvs" / "pm_cv.txt"
         text = extract_text(cv_path)
-        assert "alex muller" in text.lower()
+        assert "alex müller" in text.lower()
         assert "product manager" in text.lower()
         assert len(text) > 200
 

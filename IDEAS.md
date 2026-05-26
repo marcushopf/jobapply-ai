@@ -10,7 +10,7 @@
 
 <!-- Add new ideas below. Format: idea, why it matters, rough effort (small/medium/large) -->
 
-- [ ] **Claude CLI provider for testing** — add a `claude-cli` provider to `llm_client.py` that shells out to `claude -p "prompt"` via subprocess. Set via `LLM_PROVIDER=claude-cli` in `.env`. Unlocks unlimited free integration + Streamlit UI testing using Marcus's Claude Code Pro subscription — no Groq or Gemini key needed. Since all scripts and the Streamlit app go through `llm_client.py`, setting the env var before `streamlit run app.py` makes the full UI use Claude CLI automatically. (Small)
+- [ ] **Claude CLI provider for testing** — add a `claude-cli` provider to `llm_client.py` that shells out to `claude -p "prompt"` via subprocess. Set via `LLM_PROVIDER=claude-cli` in `.env`. Unlocks unlimited free integration + Streamlit UI testing — no Groq or Gemini key needed. Since all scripts and the Streamlit app go through `llm_client.py`, setting the env var before `streamlit run app.py` makes the full UI use Claude CLI automatically. (Small)
 - [ ] **Multi-provider LLM support** — create `scripts/llm_client.py` factory to toggle between Anthropic and Google Gemini (free tier) via environment variables. (Medium — partially done via LiteLLM)
 - [ ] Integrate LinkedIn Learning / course content to strengthen interview answers and CV language
 - [ ] Auto-detect tone of a job description (formal/startup/corporate) and match cover letter tone
@@ -108,7 +108,7 @@ Source: https://www.linkedin.com/learning/a-career-strategist-s-guide-to-getting
 <!-- Good ideas but not the right time — revisit later -->
 
 - [ ] **Cloud backup for candidate data** — `data/` is gitignored (private), so it only lives locally. If the machine is lost, all candidate profiles, CVs, job screenings and applications are gone. Need a cloud backup solution decoupled from GitHub. Leading options to evaluate:
-  - **Google Drive** — already installed on this machine (`/path/to/google-drive`). Could simply move or symlink `data/` into Google Drive. Zero extra cost, automatic sync.
+  - **Google Drive** — could simply move or symlink `data/` into Google Drive. Zero extra cost, automatic sync.
   - **iCloud Drive** — same idea, built into macOS.
   - **Encrypted S3 bucket** — more control, good if multi-device or multi-candidate use grows.
   - **Recommended starting point:** Move `data/` into Google Drive and symlink it back → lowest friction, already authenticated.
