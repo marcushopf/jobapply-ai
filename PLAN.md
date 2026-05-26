@@ -174,6 +174,52 @@ jobapply-ai/
 
 ---
 
+## PII & Data Privacy — Non-Negotiable Rules
+
+> jobapply-ai processes real candidate data: CVs, contact details, work history, salary expectations,
+> gap analyses, interview answers. Any time this data is stored or transmitted, it is PII and must
+> be handled intentionally.
+
+### What leaves the machine
+
+The following operations send candidate data to **external APIs** (i.e. off the user's laptop):
+
+| Operation | Data sent externally | API |
+|---|---|---|
+| CV parsing (Stage 1) | Full CV text | Gemini / Ollama* |
+| Job screening (Stage 2) | Skills, job titles, location | SerpAPI |
+| Gap analysis (Stage 3) | Profile + job descriptions | Gemini / Ollama* |
+| Interview (Stage 4) | Profile, gap report, answers | Gemini / Ollama* |
+| Fit report (Stage 4b) | Full profile | Gemini / Ollama* |
+| Application generation (Stage 5) | Full profile + job description | Gemini / Ollama* |
+| LinkedIn optimiser (Stage 6) | Full profile | Gemini / Ollama* |
+
+\* Ollama runs **locally** — no data leaves the machine. Gemini sends data to Google's servers.
+
+### Consent requirement — TODO (Phase 2)
+
+Before any candidate data is processed, the user must give **explicit informed consent**. This is
+not implemented yet and must be built before the tool is used with real candidates.
+
+Required behaviour:
+- [ ] **First-run consent screen** — on first launch (CLI or Streamlit), display a clear notice:
+  - Which data will be processed (CV text, profile, interview answers)
+  - Which external services may receive it (Google Gemini, SerpAPI) and their privacy policies
+  - That Ollama can be used as a local-only alternative to avoid sending data externally
+  - Explicit accept/decline — decline exits the app
+- [ ] **Per-candidate consent log** — record that consent was given, by whom, and when, in `candidates/[id]/consent.json`
+- [ ] **Provider transparency** — always show the active LLM provider in the UI (Gemini vs. Ollama) so the user knows whether data is leaving the machine at any given moment
+- [ ] **Data deletion** — document how to fully delete a candidate's data (remove `data/candidates/[id]/`)
+
+### Rules for all future development
+
+1. **Never commit candidate data** — `data/` is gitignored; never move PII into tracked files
+2. **No new external calls without disclosure** — if a new stage sends data to a new third party, update the table above and the consent screen before shipping
+3. **Ollama is the privacy-safe path** — any feature that works locally with Ollama should be documented as the zero-data-sharing option
+4. **Test fixtures use synthetic data only** — fixture names, emails, and phone numbers must be obviously fake (`@example.com`, `+49 30 555 01234`, etc.)
+
+---
+
 ## TODO: Marketing & Positioning — after testing is complete
 
 > Not a priority now. Tackle once integration + e2e tests are green and the tool is stable.
