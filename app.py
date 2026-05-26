@@ -106,6 +106,9 @@ def split_lines(s: str) -> list[str]:
 
 def api_key_exists() -> bool:
     import os
+    # Ollama runs locally and needs no API key — skip the Gemini gate entirely.
+    if os.getenv("LLM_MODEL", "").strip().startswith("ollama/"):
+        return True
     if os.getenv("GOOGLE_API_KEY", "").strip():
         return True
     try:
@@ -113,6 +116,16 @@ def api_key_exists() -> bool:
         return bool(keyring.get_password("jobapply-ai", "google_api_key"))
     except Exception:
         return False
+
+
+def llm_label() -> str:
+    """Friendly name for the active LLM provider, for use in UI messages."""
+    import os
+    model = os.getenv("LLM_MODEL", "").strip()
+    if model.startswith("ollama/"):
+        suffix = model.split("/", 1)[1]
+        return "local Ollama" if suffix == "auto" else f"Ollama ({suffix})"
+    return "Gemini"
 
 
 # ── Page: API key setup ────────────────────────────────────────────────────
@@ -252,7 +265,7 @@ def page_ingest(cid: str):
                 dest.write_bytes(f.getbuffer())
                 cv_texts.append((f.name, extract_text(dest)))
 
-        with st.spinner("Extracting profile with Gemini (this takes ~30s)..."):
+        with st.spinner(f"Extracting profile with {llm_label()} (this takes ~30s)..."):
             try:
                 name = tracker.get("name", cid)
                 new_profile = parse_profile_with_claude(cv_texts, name)
@@ -443,7 +456,7 @@ def page_screening(cid: str):
             "posted": date.today().isoformat(), "employment_type": "",
         }
 
-        with st.spinner("Scoring job with Gemini..."):
+        with st.spinner(f"Scoring job with {llm_label()}..."):
             try:
                 score, reasoning = score_job(job, profile, wishlist, client)
                 status = "shortlisted" if score >= 60 else "skipped"
