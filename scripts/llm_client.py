@@ -155,8 +155,10 @@ def _setup_provider(model: str) -> str:
 
 class LLMClient:
     def __init__(self):
-        ollama_url = os.getenv("OLLAMA_BASE_URL", _OLLAMA_DEFAULT_URL)
-        raw_model = os.getenv("LLM_MODEL", _GEMINI_MODEL)
+        # Treat empty/whitespace env values as unset so `LLM_MODEL=` in .env
+        # falls through to the default instead of becoming model="".
+        ollama_url = os.getenv("OLLAMA_BASE_URL", "").strip() or _OLLAMA_DEFAULT_URL
+        raw_model = os.getenv("LLM_MODEL", "").strip() or _GEMINI_MODEL
 
         # Resolve ollama/auto → best installed model for this machine
         self.model = _resolve_ollama_model(raw_model, ollama_url)
@@ -166,7 +168,7 @@ class LLMClient:
         # Only wired up when primary is not already Ollama.
         self._ollama_api_base = ollama_url
         if not self.model.startswith("ollama/"):
-            raw_fallback = os.getenv("LLM_FALLBACK_MODEL", "ollama/auto")
+            raw_fallback = os.getenv("LLM_FALLBACK_MODEL", "").strip() or "ollama/auto"
             fallback = _resolve_ollama_model(raw_fallback, ollama_url)
             self._fallback_model = fallback if _ollama_available(ollama_url) else None
         else:
